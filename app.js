@@ -27,7 +27,8 @@ app.get("/", (req, res) => {
 
 // Cross-Origin Resource Sharing (CORS) configuration
 
-const allowedOrigins = process.env.FRONTEND_URL?.split(',') || []
+const allowedOrigins = process.env.FRONTEND_URL?.split(',').map(origin => origin.trim()) || [];
+
 
 app.use(cors({
   origin: function (origin, callback) {
