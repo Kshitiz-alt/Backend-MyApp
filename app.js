@@ -1,20 +1,20 @@
 import express from "express";
-import dotenv from "dotenv";
+
+// Configure dotenv to load environment variables
+import 'dotenv/config';
+
+
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
 import completedOrders from "./routes/completedOrders.js";
-
 import buyerRouter from "./routes/buyerRoutes.js";
 import sellerRouter from "./routes/sellerRoutes.js";
 
 // Create an instance of express
 export const app = express();
 
-// Configure dotenv to load environment variables
-dotenv.config({
-  path: "./config/.env",
-});
+
 
 // Middleware
 app.use(express.json());
@@ -26,13 +26,20 @@ app.get("/", (req, res) => {
 });
 
 // Cross-Origin Resource Sharing (CORS) configuration
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
-  })
-);
+
+const allowedOrigins = process.env.FRONTEND_URL?.split(',') || []
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST'],
+  credentials: true
+}));
 
 // Routes
 app.use("/api/orders", buyerRouter);
